@@ -1,0 +1,11 @@
+*.db
+*.deb
+*.lnk
+*.db:encryptable
+*.deb
+*.cdl
+.~lock*
+*.bst
+*.log
+*.cht
+*:Zone.Identifier
