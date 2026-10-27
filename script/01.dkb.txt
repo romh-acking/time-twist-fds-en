@@ -66,12 +66,12 @@ Label_01.dkb_0x001A:
 Label_01.dkb_0x0012:
 	
 Label_01.dkb_0x0026:
-September 25, 1995.(LINE)This day was when it all(LINE)started...(STOP)
-Newscaster: Dr. Simon,(LINE)the physicist known as(LINE)the lonely genius, made(LINE)a very interesting(SCROLL)comment about "time(LINE)travel" last night.(STOP)
+September 25, 1995.(WAIT)This day was when it all(LINE)started...(STOP)
+Newscaster: Dr. Simon,(LINE)the physicist known as(LINE)the lonely genius, made(LINE)a very interesting(LINE)comment about "time(LINE)travel" last night.(STOP)
 Simon: Well... As the(LINE)result of years of(LINE)research, I have come(LINE)much closer to figuring(SCROLL)out "time travel",(LINE)which has only been a(LINE)fantasy up until now...(STOP)
-This is the fortune(LINE)telling service center,(LINE)presenting "today's(LINE)fortune".(LINE)(LINE)Please provide your(LINE)blood type.(STOP)
+This is the fortune(LINE)telling service center,(LINE)presenting "today's(LINE)fortune".(WAIT)Please provide your(LINE)blood type.(STOP)
 What month were you(LINE)born in?(STOP)
-We will now begin the(LINE)personality assessment.(LINE)Please answer the(LINE)following questions.(STOP)
+We will now begin the(LINE)personality assessment.(WAIT)Please answer the(LINE)following questions.(STOP)
 Do you like consomme(LINE)soup more than miso(LINE)soup?(STOP)
 Can you swim at least(LINE)50 meters?(STOP)
 Have you ever suddenly(LINE)burst into laughter for(LINE)no reason?(STOP)
@@ -89,21 +89,21 @@ Do you want to live a(LINE)daring and short life?(STOP)
 If you have love, do(LINE)you not need anything(LINE)else?(STOP)
 Please wait a moment.(STOP)
 Your personality is...(STOP)
-You avoid conflict and(LINE)are a cool-headed(LINE)pacifist.(LINE)You are good at(SCROLL)managing information(LINE)and are the(SCROLL)intellectual type.(LINE)While sociable, you(SCROLL)don't like belonging to(LINE)organizations.(SCROLL)You tend to avoid deep(LINE)connections.(SCROLL)You end up feeling(LINE)isolated.(SCROLL)You often analyze(LINE)yourself objectively.(STOP)
-You plan carefully to(LINE)never make mistakes,(LINE)but it's easy for you(LINE)to become mediocre.(SCROLL)You work diligently and(LINE)methodically.(SCROLL)You are the earnest and(LINE)stubborn scholarly(SCROLL)type.(LINE)You sometimes tire(SCROLL)yourself out by(LINE)worrying too much about(SCROLL)others.(LINE)You are clumsy when it(SCROLL)comes to love, but are(LINE)deeply romantic at(SCROLL)heart.(STOP)
-Optimistic and loved by(LINE)everyone, you are full(LINE)of personality and(LINE)popular.(SCROLL)Although you are(LINE)passionate about what(SCROLL)you love, you quickly(LINE)lose motivation when(SCROLL)you lose interest.(LINE)You sometimes make(SCROLL)unexpected blunders.(LINE)Your curiosity and(SCROLL)sharp intuition make(LINE)people that are like(SCROLL)you well-suited to be a(LINE)journalist.(STOP)
-You are earnest and(LINE)enthusiastic about(LINE)everything.(LINE)You always focus on the(SCROLL)main issue at hand, and(LINE)are the political type.(SCROLL)You value honor and(LINE)care little about(SCROLL)money. Strong(LINE)self-assertion often(SCROLL)leads to selfishness.(LINE)It's easy for you to(SCROLL)change.(LINE)You always dream of a(SCROLL)dramatic romance.(STOP)
-"Today's fortune"(LINE)Today will become an(LINE)unforgettable day for(LINE)you.(SCROLL)Staying calm and strong(LINE)will lead you to good(SCROLL)fortune.(LINE)There is an opportunity(SCROLL)for a meeting in a(LINE)museum in the suburbs.(SCROLL)A lovely woman will(LINE)surely throw herself(SCROLL)into your arms.(LINE)This is what you must(SCROLL)say!(LINE)You must say...(STOP)
+You avoid conflict and(LINE)are a cool-headed(LINE)pacifist.(WAIT)You are good at(SCROLL)managing information(LINE)and are the(SCROLL)intellectual type.(WAIT)While sociable, you(SCROLL)don't like belonging to(LINE)organizations.(WAIT SCROLL)You tend to avoid deep(LINE)connections.(WAIT SCROLL)You end up feeling(LINE)isolated.(WAIT SCROLL)You often analyze(LINE)yourself objectively.(STOP)
+You plan carefully to(LINE)never make mistakes,(LINE)but it's easy for you(LINE)to become mediocre.(WAIT SCROLL)You work diligently and(LINE)methodically.(WAIT SCROLL)You are the earnest and(LINE)stubborn scholarly(SCROLL)type.(WAIT)You sometimes tire(SCROLL)yourself out by(LINE)worrying too much about(SCROLL)others.(WAIT)You are clumsy when it(SCROLL)comes to love, but are(LINE)deeply romantic at(SCROLL)heart.(STOP)
+Optimistic and loved by(LINE)everyone, you are full(LINE)of personality and(LINE)popular.(WAIT SCROLL)Although you are(LINE)passionate about what(SCROLL)you love, you quickly(LINE)lose motivation when you(SCROLL)lose interest.(WAIT)You sometimes make(SCROLL)unexpected blunders.(WAIT)Your curiosity and sharp(SCROLL)intuition make people(LINE)that are like you(LINE)well-suited to be a(LINE)journalist.(STOP)
+You are earnest and(LINE)enthusiastic about(LINE)everything.(WAIT)You always focus on the(SCROLL)main issue at hand, and(LINE)are the political type.(WAIT SCROLL)You value honor and(LINE)care little about(SCROLL)money.(WAIT)Strong self-assertion(SCROLL)often leads to(LINE)selfishness.(WAIT SCROLL)It's easy for you to(LINE)change.(WAIT)You always dream of a(LINE)dramatic romance.(STOP)
+"Today's fortune"(LINE)(WAIT)Today will become an(LINE)unforgettable day for(SCROLL)you.(WAIT)Staying calm and strong(SCROLL)will lead you to good(LINE)fortune.(WAIT SCROLL)There is an opportunity(LINE)for a meeting in a(SCROLL)museum in the suburbs.(WAIT)A lovely woman will(SCROLL)surely throw herself(LINE)into your arms.(WAIT)This is what you must(LINE)say!(WAIT)You must say...(STOP)
 You must say...(STOP)
-...Maraduru barao(LINE)garadura...(LINE)It keeps chanting the(LINE)same thing over and(SCROLL)over.(LINE)...Maraduru barao(SCROLL)garadura...(LINE)...Maraduru barao(SCROLL)garadura...!(STOP)
-Time travel, huh...(LINE)It's all talk without(LINE)anything actually(LINE)coming out of it(SCROLL)though.(LINE)(WAIT #3)Anyway...(STOP)
-...(LINE)How strange...(LINE)Was that a spell of(LINE)some sort?(LINE)Oh well... I better go(LINE)now!(STOP)
+...Maraduru barao(LINE)garadura...(LINE)(WAIT)It keeps chanting the(SCROLL)same thing over and(LINE)over.(WAIT SCROLL)...Maraduru barao(LINE)garadura...(WAIT)...Maraduru barao(LINE)garadura...!(STOP)
+Time travel, huh...(LINE)It's all talk without(LINE)anything actually(LINE)coming out of it(LINE)though.(WAIT)Anyway...(STOP)
+...(WAIT)How strange...(WAIT)Was that a spell of(LINE)some sort?(WAIT)Oh well... I better go(LINE)now!(STOP)
 
 // File Address: 0x079E; RAM Address: 0xA99E
 Label_01.dkb_0x089B:
-...We're sorry for the(LINE)interruption.(LINE)You must say...(LINE)"When you smile, it's(SCROLL)like the sun rises."(LINE)Thank you for watching.(STOP)
-It's almost the 21st(LINE)century...(LINE)But people aren't(LINE)really welcoming this(SCROLL)new era.(LINE)Like usual, there are(SCROLL)conflicts all around(LINE)the world.(SCROLL)There continually are(LINE)reports of(SCROLL)environmental(LINE)destruction and food(SCROLL)shortages.(LINE)Anyone that looks at(SCROLL)the future of the earth(LINE)gets anxious.(STOP)
-Because of this, modern(LINE)people are lost and(LINE)have started to look(LINE)for salvation in(SCROLL)fortune telling.(LINE)This is why, in these(SCROLL)dark times, a guide is(LINE)necessary.(SCROLL)And strangely enough,(LINE)this one works.(STOP)
+...We're sorry for the(LINE)interruption.(LINE)You must say...(LINE)"When you smile, it's(SCROLL)like the sun rises."(WAIT)Thank you for watching.(STOP)
+It's almost the 21st(LINE)century...(WAIT)But people aren't(LINE)really welcoming this(SCROLL)new era.(LINE)Like usual, there are(SCROLL)conflicts all around(LINE)the world.(WAIT SCROLL)There continually are(LINE)reports of(SCROLL)environmental(LINE)destruction and food(SCROLL)shortages.(WAIT)Anyone that looks at(LINE)the future of the earth(LINE)gets anxious.(STOP)
+Because of this, modern(LINE)people are lost and(LINE)have started to look(LINE)for salvation in(SCROLL)fortune telling.(WAIT)This is why, in these(SCROLL)dark times, a guide is(LINE)necessary.(WAIT)And strangely enough,(LINE)this one works.(STOP)
 
 // File Address: 0x089B; RAM Address: 0xAA9B
 Label_01.dkb_0x0024:
@@ -112,11 +112,13 @@ Label_01.dkb_0x0024:
 
 // File Address: 0x089D; RAM Address: 0xAA9D
 Label_01.dkb_0x0016:
-time(STOP)
 personality(STOP)
+September(STOP)
+garadura(STOP)
 Maraduru(STOP)
 barao(STOP)
-garadura(STOP)
+time(STOP)
+er(STOP)
 (STOP)
 (STOP)
 ああへあうちこねああああゆのい＿け

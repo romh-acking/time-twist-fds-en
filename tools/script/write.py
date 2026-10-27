@@ -9,11 +9,12 @@ STOP_CODE = 5
 FILE_RAM_LOCATION = 0xA200
 LABEL_DICTIONARY = 0x16
 
+UNCOMPRESSED_TOKEN = "<UNCOMPRESSED>"
+
 CHARSET_9 = "＿・\"—おがぎぐげござじずぜぞだぢづでどなにぬねのばびぶべぼ゛゜ぱぴぷぺぽぁぃぅぇぉっゃゅょ1234567890ー！？」「‥♡　"
 CHARSET_6 = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん、。"
 
-CHARSET_EN_9 = "＿・\"—おがぎぐげござじずぜぞだぢづでどなにぬねのばびぶべぼ゛゜ぱぴぷぺぽぁぃぅぇぉっゃゅょ1234567890ー!?」「‥♡ "
-CHARSET_EN_6 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ.,:'まみむめもやゆよらりるれろわをん、。"
+CHARSET_EN_6 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ.,:'!?♡\"-1234567890 $。"
 
 script = ''
 bits = ''
@@ -21,6 +22,9 @@ dictionary = {}
 
 global externalPointerMetadata
 externalPointerMetadata = {}
+
+global replacePointerId
+replacePointerId = -1
 
 def parse_bool(value):
     return value.strip().lower() == "true"
@@ -56,15 +60,55 @@ def padByte(i):
     return i
 
 def replaceDictValues(match):
-    block = match.group(1)
+    str = match.group(1)
 
-    for key, value in dictionary.items():
-        pattern = re.compile(re.escape(value), re.IGNORECASE)
-        block = pattern.sub(f"(Dict {key})", block)
+    if str.startswith(UNCOMPRESSED_TOKEN):
+        return str.replace(UNCOMPRESSED_TOKEN, "")
 
-    return block 
+    for key, value in sorted(dictionary.items(), key=lambda item: len(item[1].replace("(LINE)", "x")), reverse=True):
+        if replacePointerId == LABEL_DICTIONARY and str.lower() == value.lower():
+            continue
+        
+        if "(" in value and value in str:
+            pattern = re.compile(re.escape(value), re.IGNORECASE)
+            str = pattern.sub(f"(Dict {key})", str) 
+            continue
 
-def write(script, filename, dryRun, fixedData, isFirstRun):
+        split = list(filter(None, re.split(r"(\(.*?\))", str)))
+        for i in range(len(split)):
+            if split[i].startswith("("):
+                continue
+            pattern = re.compile(re.escape(value), re.IGNORECASE)
+            split[i] = pattern.sub(f"(Dict {key})", split[i])
+        
+        str =  "".join(split)
+
+    return str
+
+def findReplaceDictionary(script):
+    splitted = list(filter(None, re.split(rf"(<.*?>)|(Label_[0-9]+\.dk[a-z]_0x.*?\:)", script)))
+
+    global replacePointerId
+
+    for i in range(len(splitted)):
+        m = re.match(r"Label_.*?.dk[a-z]_(.*?):", splitted[i])
+
+        if m:
+            m = m.group(1)
+            replacePointerId = int(m, 16)
+
+        if replacePointerId == LABEL_DICTIONARY:
+            continue
+
+        splitted[i] = re.sub(
+            r"(?<=\n)(.*?)(?=\(STOP\))",
+            replaceDictValues,
+            splitted[i],
+        )
+
+    return "".join(splitted)
+
+def write(script, filename, dryRun, fixedData, isTranslation, isFirstRun):
     global bits
 
     pointerLocation = {}
@@ -74,26 +118,20 @@ def write(script, filename, dryRun, fixedData, isFirstRun):
     dictionaryBuffer = ''
     labelId = -1
 
-    splitted = re.split(fr"(Label_[0-9]+\.dk[a-z]_0x{LABEL_DICTIONARY:04X}\:)", script)
+    script = findReplaceDictionary(script)
 
-    if len(splitted) == 3:
-        global dictionary
-
-        # Process every block beginning after \n and ending before (STOP)
-        splitted[0] = re.sub(
-            r"(?<=\n)(.*?)(?=\(STOP\))",
-            replaceDictValues,
-            splitted[0],
-        )
-
-    script = splitted[0] + splitted[1] + splitted[2]
     script = re.sub(r"//.*?\n", "", script)
     script = script.replace("\n", "", -1)
+
+    #script ="Disk Error(STOP)"
+    #bits = ''
 
     split = list(filter(None, re.split(
         r"(Label_.*?:|<.*?>|{.*?}|\(.*?\)|[\u3040-\u309F\u30A0-\u30FF0-9‥A-Za-z\"！？　 ,.?!])", script)))
 
     for a in split:
+        if a == UNCOMPRESSED_TOKEN:
+            continue
         if a.startswith("<Pointer"):
             i = padByte(i)
 
@@ -105,8 +143,8 @@ def write(script, filename, dryRun, fixedData, isFirstRun):
 
             bits += '1111111111111111'
             i += 16
-        elif a.startswith("Label_"):
-            dialogueId = 1
+        elif a.startswith("Label_"):                
+            dialogueId = 0
             dictionaryBuffer = ''
             i = padByte(i)
 
@@ -120,12 +158,11 @@ def write(script, filename, dryRun, fixedData, isFirstRun):
                 addr = fixedData[label] * 8
 
                 if i > addr:
-                    raise ValueError(f"fixed label out of range: {label}; {hex(i//8)} > {hex(addr//8)}")
-
+                    raise Exception(f"fixed label out of range: {label}; {hex(i//8)} > {hex(addr//8)}")
 
                 while i != addr:
                     if i > addr:
-                        raise f"{i} > {addr}"
+                        raise Exception(f"{i} > {addr}")
 
                     bits += '1111'
                     bits += intToBitsWithPadding(STOP_CODE, 3)
@@ -141,10 +178,26 @@ def write(script, filename, dryRun, fixedData, isFirstRun):
             bits += hexToBits(hexVal)
             i += 8
         elif a.startswith("(Dict "):  # 9-bit
-            bits += '1110'
-            val = int(re.match(r"\(Dict (.*?)\)", a).group(1))
-            bits += intToBitsWithPadding(val, 5)
-            i += 9
+            if isTranslation:
+                val = int(re.match(r"\(Dict (.*?)\)", a).group(1))
+
+                if val < 0x40:
+                    bits += '110'
+                    bits += intToBitsWithPadding(val, 6)
+                    i += 9
+                elif val < 0x40 + 0x20:
+                    val -= 0x40
+                    bits += '1110'
+                    bits += intToBitsWithPadding(val, 5)
+                    i += 9
+                else:
+                    raise Exception(f"Dictionary value out of range: #${val:02X}")
+            else:
+                bits += '1110'
+                val = int(re.match(r"\(Dict (.*?)\)", a).group(1))
+                bits += intToBitsWithPadding(val, 5)
+                i += 9
+            
         elif a.startswith("("):  # 7-bit
             bits += '1111'
 
@@ -152,6 +205,8 @@ def write(script, filename, dryRun, fixedData, isFirstRun):
             isStop = False
             if a == "(LINE)":
                 code = 0
+            elif isTranslation and a == "(WAIT)":
+                code = 1
             elif a == "(WAIT #1)":
                 code = 1
             elif a == "(WAIT #2)":
@@ -161,10 +216,8 @@ def write(script, filename, dryRun, fixedData, isFirstRun):
             elif a == "(SCROLL)":
                 code = 4
             elif a == "(STOP)":
-                if dictionaryBuffer != '':
-                    dictionary[dialogueId] = dictionaryBuffer
                 code = STOP_CODE
-                dialogueId = dialogueId + 1
+                dialogueId += 1
                 isStop = True
             elif a == "(WAIT #3)":
                 code = 6
@@ -177,33 +230,31 @@ def write(script, filename, dryRun, fixedData, isFirstRun):
             i += 7
 
             if isStop:
-                if i % 8 != 0:
-                    while i % 8:
-                        bits += '0'
-                        i += 1
-                
-            dictionaryBuffer = ''
+                if dictionaryBuffer != '':
+                    dictionary[dialogueId] = dictionaryBuffer
+                    dictionaryBuffer = ''
+                i = padByte(i)
+            else:   
+                if labelId == LABEL_DICTIONARY:
+                    dictionaryBuffer += a
         else:
-            if labelId == 0x16:
+            if labelId == LABEL_DICTIONARY:
                 dictionaryBuffer += a
 
             a = a.upper()
+            
+            index = 0
 
-            if re.search(rf"([{CHARSET_6}])", a):
+            if isTranslation and re.search(rf"([{CHARSET_EN_6}])", a):
+                index = CHARSET_EN_6.index(a)
+                bits += intToBitsWithPadding(index, 6)
+                i += 6
+            elif re.search(rf"([{CHARSET_6}])", a):
                 index = CHARSET_6.index(a)
                 bits += intToBitsWithPadding(index, 6)
                 i += 6
             elif re.search(rf"([{CHARSET_9}])", a):
                 index = CHARSET_9.index(a)
-                bits += '110'
-                bits += intToBitsWithPadding(index, 6)
-                i += 9
-            elif re.search(rf"([{CHARSET_EN_6}])", a):
-                index = CHARSET_EN_6.index(a)
-                bits += intToBitsWithPadding(index, 6)
-                i += 6
-            elif re.search(rf"([{CHARSET_EN_9}])", a):
-                index = CHARSET_EN_9.index(a)
                 bits += '110'
                 bits += intToBitsWithPadding(index, 6)
                 i += 9
@@ -218,7 +269,7 @@ def write(script, filename, dryRun, fixedData, isFirstRun):
             if label in externalPointerMetadata:
                 localAddr = int(externalPointerMetadata[label], 16)
             else:
-                raise ValueError(f'Not found: {label}')
+                raise Exception(f'Not found: {label}')
 
             laloc = localAddr + FILE_RAM_LOCATION
             
@@ -235,6 +286,7 @@ def main():
         "externalPointerMetadata=",
         "dryRun=",
         "fixedData=",
+        "isTranslation=",
     ]
     argumentList = sys.argv[1:]
 
@@ -243,6 +295,7 @@ def main():
     externalPointerMetadataFile = ""
     dryRun = False
     fixedData = {}
+    isTranslation = False
 
     global externalPointerMetadata
 
@@ -267,6 +320,8 @@ def main():
                 for i in range(0, len(split), 2):
                     addr = split[i + 1]
                     fixedData[split[i]] = int(addr, 16)
+            elif currentArgument in ("--isTranslation"):
+                isTranslation = parse_bool(currentValue)
                  
     except getopt.error as err:
         print(str(err))
@@ -282,10 +337,10 @@ def main():
     
     filename = os.path.basename(inputFilePath).replace(".txt", "", -1)
 
-    write(script, filename, dryRun, fixedData, True)
+    write(script, filename, dryRun, fixedData, isTranslation, True)
     global bits
     bits = ''
-    out = write(script, filename, dryRun, fixedData, False)
+    out = write(script, filename, dryRun, fixedData, isTranslation, False)
 
     if not dryRun:
         with open(outputFilePath, 'wb') as file:

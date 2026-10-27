@@ -19,9 +19,17 @@ def main():
     print("Paste your line below.")
 
     # Read multiple lines until an empty line is entered
-    data = ''
-    while not data:
-        data = input()
+    lines = []
+
+    while True:
+        line = input()
+        if line == "":
+            break
+        lines.append(line)
+
+    data = "\n".join(lines)
+
+    print(data)
 
     chunks = re.split("(\(.*?\))|(\s+(?![^\(]*\))(?![^\[]*\]))|({.*?})|(\<.*?\>)", data)
     chunks = [x for x in chunks if x != '' and x != None]
@@ -32,8 +40,34 @@ def main():
     newLine = ""
     lineNumber = 0
 
+
     while iii < len(chunks):
         word = chunks[iii]
+
+        if word == "(STOP)":
+            newLine += word
+            iii += 1
+            lineLength = 0
+            lineNumber = 0
+            continue
+        
+        if word == "(WAIT)":
+            if lineNumber == 3:
+                word = "(WAIT SCROLL)"
+                lineNumber -= 2
+                
+            newLine += word
+            iii += 1
+            lineLength = 0
+            lineNumber += 1
+            continue
+
+        if word == "(SCROLL)":
+            newLine += word
+            iii += 1
+            lineLength = 0
+            lineNumber -= 2
+            continue
 
         if word == "(LINE)":
             if lineNumber == 3:
@@ -52,7 +86,7 @@ def main():
             
         wordLength = getWordLength(word)
 
-        if lineLength + wordLength < maxLineLength:
+        if lineLength + wordLength <= maxLineLength:
             lineLength += wordLength
             newLine += word
             iii += 1

@@ -127,7 +127,8 @@ org $000034D3; base $94D3; fill $01, $ea
 ///////////////////
 org $0000226F; base $826F; fill $4F, $ea
 org $0000226F; base $826F
-lda {LineNumber}
+LineCalc:
+  lda {LineNumber}
   bne NotLine1
   ldx #$18
   jmp LINE
@@ -186,102 +187,181 @@ org $000023C6; base $83C6
 	lda #$22		// hi
 
 ///////////////////
-// Adjust (WAIT #1) spacing
+// Adjust WAIT spacing
 ///////////////////
-//org $0000202D; base $802D
-//	ldx #$18
 
-//org $000023B9; base $83B9; fill $0D,$ea
-//org $000023B9; base $83B9
-//	inc $69
-//	rts
+// (WAIT #1)
+org $00002027; base $8027; fill $0C, $ea
+// (WAIT #2)
+org $0000200E; base $800E; fill $0C, $ea
+// (WAIT #3)
+org $00002040; base $8040; fill $0C, $ea
+
+org $00002027; base $8027
+  jsr CalcLinePrint
+  jmp LineCalc
 
 ///////////////////
-// Expand menu
+// Menu: Double space => single space
 ///////////////////
-// Not enough space to store expanded tilemap
-org $000028A3; base $88A3
-	db $05,$25,$45,$65,$85,$A5,$C5,$E5
-
-org $00002896; base $8896
-	ldx #$16
-
-// Bottom start index
-org $0000281D; base $881d
-	ldy #$2C
-// Middle start index
-org $00002822; base $8822
-	ldy #$58
-	
-org $00002827; base $8827
-	ldx #$2C
-
-// Relocate tilemap
-//org $00002829; base $8829
-	//lda $89ae,y
-	
-org $000028AB; base $88AB
-	db $A6,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A7
-	db $AA,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$AB
-	db $A9,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$AC,$A9
-	db $AA,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$A8,$AB
-
-// Relocate where sprite data starts
-org $00002B53; base $8B53
-	lda {SpriteSlot03Constant}&$FF //lo
-org $00002B57; base $8B57
-	lda {SpriteSlot03Constant}>>8 // hi
-
-org $000030B8; base $90b8
-	lda {SpriteSlot03Constant}&$FF //lo
-org $000030Bc; base $90bc
-	lda {SpriteSlot03Constant}>>8 // hi
-
-org $00002B0C; base $8b0c
-	sta {SpriteSlot01}
-	sta {SpriteSlot02}
-
-org $00001156; base $7156
-	sbc {SpriteSlot02}
-	sta {SpriteSlot01}
-
-org $0000115E; base $715e
-	sta {SpriteSlot02}
-  
-org $0000108B; base $708b
-	stx {SpriteSlot01}
-	stx {SpriteSlot02}
-	
-org $00002BA9; base $8ba9
-	sta {SpriteSlot01}
-
-org $000030B0; base $90B0
-	lda {SpriteSlot01}
-
-org $00002B4E; base $8b4e
-	lda {SpriteSlot01}
-	
-org $00002B62; base $8b62
-	lda {SpriteSlot01}
-	
-org $00001152; base $7152
-	lda {SpriteSlot01}
-	
 //------------------
-// Adjust text printing / sprites
+// Printing
 //------------------
+// Change text spacing
+org $00003483; base $9483; fill $01, $ea
 
-// Move left column left
-org $000034AF; base $94AF
-	lda #$47
+// Remove column shift (X)
+org $00003499; base $9499; fill $16, $ea
 
-// Move left column left
+// Remove column shift (Y)
+org $00003481; base $9481; fill $03, $ea
+	
+//org $00002896; base $8896
+	//ldx #$16
+
+//------------------
+// Sprite remove column change
+//------------------
+// Change text spacing
+org $00003876; base $9876; fill $03, $ea
+
+// Remove column shift (Y)
+org $00003885; base $9885; fill $0B, $ea
+
+//------------------
+// Sprite: L/R D-pad
+//------------------
+// Right d-pad
+org $00003946; base $9946
+	adc #$00
+	
+// Left d-pad
+org $00003979; base $9979
+	sbc #$00
+
+//------------------
+// Sprite alignment
+//------------------
 org $00003890; base $9890
-	lda #$30
+	lda #$38
+	
+// Remove right sprite of cursor
+//org $0000389F; base $989F; fill $0E, $ea
+
+// Move right sprite of cursor
+org $000038A2; base $98A2
+	adc #$88
+
+//------------------
+// ETC
+//------------------
+// Move text to left
+org $000034AF
+  lda #$48
 
 // Extend text limit
 org $000034BC; base $94BC
-	lda #$09
+	lda #$0F
 
-// Move right sprite of cursor
-org $0000389F; base $989F; fill $0E, $ea
+///////////////////
+// Repurpose STRING_9 to be a dictionary
+///////////////////
+org $22BE; base $82BE; fill $7, $ea
+org $22BE; base $82BE
+	jmp BottomDictionary
+	
+org $21CC; base $81CC; fill $49, $ea
+org $21CC; base $81CC
+	// Mostly copied from 0x22BE (RAM: $82BE)
+	// The original dictionary reading code.
+	
+TopDictionary:
+	lda #$00
+	sta $3a
+	jsr $810a // Read 6 bits
+	
+	jmp $82C5
+BottomDictionary:
+	lda #$00
+	sta $3a
+	jsr $810d // Read 5 bits
+	
+	lda $3a
+	clc
+	adc #$40
+	sta $3a
+	
+	jmp $82C5
+
+// $6E is a byte that controls where to start writing in the PPU
+// The wrong value will result in longer wait time with a text printing SFX playing
+CalcLinePrint:
+	lda {LineNumber}
+	cmp #$03
+	bcc CalcLinePrint_NotLine4
+		lda #$ff
+		bne CalcLinePrint_Exit
+	CalcLinePrint_NotLine4:
+		cmp #$01
+		bcc CalcLinePrint_NotLine2
+		lda #$80
+		bne CalcLinePrint_Exit
+	CalcLinePrint_NotLine2:
+		lda #$70
+	
+	CalcLinePrint_Exit:
+		sta $6e
+		rts
+
+///////////////////
+// Disk changing text: Switch 2nd and last line
+///////////////////
+// The game writes to a buffer to write string ids to print.
+// Change where "SIDE B" dialogue id is stored
+org $00001A17; base $7a17
+	sty $7ABB
+
+// Set buffer default value
+org $00001AB9; base $7AB9
+	db $08
+	
+// The game writes to a buffer to write string ids to print.
+// Change where "SIDE A" dialogue id is stored
+org $00001AF4; base $7af4
+	sta $7ABB
+org $00000033; base $6033
+	lda $7ABB
+
+// There's a function used to check if the third line was changed.
+// If the test fails, the game prints the LOADING text.
+// We obviously need to change this.
+org $00001AA2; base $7AA2
+	db $BB,$7A
+
+///////////////////
+// Disk changing text
+///////////////////
+
+// Hardcoded pointer I'm not supporting in my tool lol
+//  8059: lda #$d9
+//  805B: sta $6a
+//  805D: lda #$85
+//  805F: sta $6b
+
+org $000025D9; base $85D9; fill $152, $FA
+org $000025D9; base $85D9
+	// Original String
+	// しばらく(LINE)  おまちください(STOP)えー らむせーぶ(LINE)びー ですくせーぶ(LINE)せる きゃんせる(STOP)でぃすくせーぶ(LINE)しとるからの(STOP)ぜんぺんの(STOP)こうへんの(STOP)(LINE)えーめんを(STOP)(LINE)びーめんを(STOP)(LINE)(LINE)せっとしてください(STOP)(STOP)しょうはじめ(STOP)(STOP)(STOP)でぃすく、とらぶる(STOP)おぼえる(STOP)せーぶ(STOP)おもいだす(STOP)さいしょから(STOP)ろーど(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)せーぶでーたが、いじょうです(STOP)(LINE)げんざいのじょうたいで(LINE)ふぁいるをさくせいします(STOP)(LINE)さいしょからはじめます。(STOP)でぃすくせっと(STOP)ばってりー(STOP)らいとぷろてくと(STOP)げーむ めいかー(STOP)げーむ ねーむ(STOP)げーむ ばーじょん(STOP)えーびーさいど(STOP)でぃすく なんばー(STOP)(LINE)     えらー(STOP)ちがった でぃすくが(STOP)(LINE)    せっとされています(STOP)いったいさん(STOP)なにかようかの？(STOP)(STOP)はい(STOP)いいえ(STOP)いったい「じゃあつづきを はなすとするかの」(STOP)
+	
+	// Translated
+	// Now(LINE)  loading...(STOP)RAM Save(LINE)Disk save(LINE)Cancel(STOP)Disk save done(STOP)Part 1(STOP)Part 2(STOP)(LINE)(LINE)Side A(STOP)(LINE)(LINE)Side B(STOP)(LINE)Switch to(STOP)(STOP)From Start(STOP)(STOP)(STOP)Disk Error(STOP)Remember(STOP)Save(STOP)Recall(STOP)From Start(STOP)Load(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)(STOP)Save corrupt(STOP)(LINE)right now(LINE)Create file(STOP)(LINE)New game(STOP)Disk insertion(STOP)Battery(STOP)Write protected(STOP)Game maker(STOP)Game name(STOP)Game version(STOP)Side AB(STOP)Disk No(STOP)(LINE)  Error(STOP)Wrong disk(STOP)(LINE)  inserted(STOP)Ittai(STOP)What's up?(STOP)(STOP)Yes(STOP)No(STOP)Ittai: Continue?(STOP)
+
+	db $34,$E5,$BC,$5B,$69,$67,$00,$19,$06,$8C,$D3,$4D,$7D,$44,$03,$2D,$48,$05,$44,$F0,$19,$09,$15,$6A,$40,$2A,$27,$80,$80,$34,$21,$0B,$FA,$0C,$84,$8A,$B5,$20,$15,$12,$D0,$CE,$34,$4F,$A0,$3C,$04,$53,$B6,$3F,$A0,$3C,$04,$53,$B6,$4F,$A0,$F1,$E1,$22,$03,$12,$D0,$3E,$80,$F1,$E1,$22,$03,$12,$D0,$7E,$80,$F0,$92,$C4,$26,$10,$F6,$A6,$77,$D0,$FA,$15,$13,$8C,$B5,$24,$C0,$45,$3F,$A0,$FA,$FA,$0C,$84,$8A,$B4,$44,$51,$39,$1F,$A0,$44,$43,$04,$30,$11,$11,$FA,$48,$05,$44,$FA,$44,$40,$80,$2C,$BF,$A0,$15,$13,$8C,$B5,$24,$C0,$45,$3F,$A0,$2C,$E0,$03,$FA,$FA,$FA,$FA,$FA,$FA,$FA,$FA,$FA,$FA,$FA,$FA,$FA,$FA,$48,$05,$44,$B4,$23,$91,$45,$43,$D3,$FA,$F0,$89,$03,$0E,$9D,$A6,$9C,$B7,$80,$91,$10,$04,$C4,$B4,$52,$0B,$13,$E8,$F0,$68,$8B,$5A,$30,$06,$09,$F4,$0C,$84,$8A,$B4,$83,$52,$11,$14,$C8,$38,$DF,$A0,$04,$04,$D3,$11,$16,$3E,$80,$59,$12,$13,$12,$D3,$D1,$39,$31,$02,$4C,$40,$FE,$80,$18,$03,$04,$B4,$C0,$0A,$11,$1F,$A0,$18,$03,$04,$B4,$D0,$0C,$13,$E8,$18,$03,$04,$B5,$51,$11,$48,$83,$8D,$FA,$48,$80,$C4,$B4,$00,$7E,$80,$0C,$84,$8A,$B4,$D3,$BE,$80,$F1,$6D,$A2,$22,$89,$C8,$FD,$59,$13,$8D,$1A,$D0,$C8,$48,$AF,$A0,$F1,$6D,$A4,$1A,$90,$88,$A6,$20,$7F,$40,$21,$34,$C0,$23,$E8,$58,$70,$13,$75,$2B,$54,$3D,$FF,$A0,$FA,$60,$44,$BE,$80,$34,$EF,$A0,$21,$34,$C0,$21,$CB,$42,$38,$D4,$C8,$35,$41,$1F,$FA
+
+///////////////////
+// FDS filelist for disk loading
+///////////////////
+
+// TT4B file id
+org $00001BC5
+	db $47,$48,$57,$FF
