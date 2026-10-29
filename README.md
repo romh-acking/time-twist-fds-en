@@ -74,6 +74,8 @@ While there's a manual which came with the game and the disk fax pamphlet, I onl
 The folder `zzz_extras` contains table files for a debug emulator's RAM viewer. This allows you to see text in the game's text buffer at `0x8747`. Simply load the table files in the memory viewer and jump to the address.
 
 ## Changelog
+* 2026 October 29th: 1.1
+    * Crash fix in the Underworld segment. Failing the mini-game on any of the men that isn't the 1st crashes or resets the chapter. This is because of some unaccounted for pointers in the scripting system.
 * 2026 October 27th: 1.0
     * Initial release
 

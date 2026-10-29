@@ -323,6 +323,7 @@ def dump(filename, attempt=0):
                 for args in (
                     ([0x40], True, 4),
                     ([0x40, 0x73], True, 4),
+                    ([0x40, 0x75], True, 7),
                     ([0x40, 0x76], True, 9),
                     ([0x41], False, 1),
 
